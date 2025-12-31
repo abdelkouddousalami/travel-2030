@@ -1,0 +1,33 @@
+# MySQL Credentials
+MYSQL_CREDENTIALS.md
+
+# Backend (Java/Maven)
+backend/target/
+backend/.idea/
+backend/*.iml
+*.class
+*.jar
+*.war
+*.ear
+.DS_Store
+
+# Frontend (Angular/Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.idea/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
