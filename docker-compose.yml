@@ -1,0 +1,112 @@
+# ============================================================================
+# Travel2030 Docker Compose Configuration
+# MySQL 8.0 + Spring Boot Backend (Optional)
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # MySQL Database Service
+  # ============================================================================
+  mysql:
+    image: mysql:8.0
+    container_name: travel2030-mysql
+    restart: unless-stopped
+    
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_change_me
+      MYSQL_DATABASE: travel2030
+      MYSQL_USER: travel2030_user
+      MYSQL_PASSWORD: travel2030_pass
+      TZ: UTC
+    
+    ports:
+      - "3306:3306"
+    
+    volumes:
+      # Persist database data
+      - mysql_data:/var/lib/mysql
+      # Custom MySQL configuration (optional)
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+      # Initialization scripts (optional)
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    
+    networks:
+      - travel2030-network
+    
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_change_me"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ============================================================================
+  # Spring Boot Backend Service (Optional - uncomment to use)
+  # ============================================================================
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: travel2030-backend
+  #   restart: unless-stopped
+  #   
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: docker
+  #     SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/travel2030?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+  #     SPRING_DATASOURCE_USERNAME: travel2030_user
+  #     SPRING_DATASOURCE_PASSWORD: travel2030_pass
+  #   
+  #   ports:
+  #     - "8085:8085"
+  #   
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #   
+  #   networks:
+  #     - travel2030-network
+
+  # ============================================================================
+  # phpMyAdmin (Optional - Database Management UI)
+  # ============================================================================
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: travel2030-phpmyadmin
+    restart: unless-stopped
+    
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: travel2030_user
+      PMA_PASSWORD: travel2030_pass
+      UPLOAD_LIMIT: 50M
+    
+    ports:
+      - "8080:80"
+    
+    depends_on:
+      - mysql
+    
+    networks:
+      - travel2030-network
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  mysql_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  travel2030-network:
+    driver: bridge
