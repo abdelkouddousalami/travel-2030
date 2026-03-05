@@ -1,0 +1,94 @@
+<!-- Navigation Bar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
+      <span class="logo-icon">T</span>
+      <span class="logo-text">Travel2030</span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="nav-menu" [class.active]="isMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        Accueil
+      </a>
+      <a *ngIf="currentUser" routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        Dashboard
+      </a>
+      <a routerLink="/destinations" routerLinkActive="active" class="nav-item">
+        Destinations
+      </a>
+      <a *ngIf="currentUser" routerLink="/trips" routerLinkActive="active" class="nav-item">
+        Mes Voyages
+      </a>
+      <a *ngIf="currentUser" routerLink="/bookings" routerLinkActive="active" class="nav-item">
+        Reservations
+      </a>
+      <a routerLink="/community" routerLinkActive="active" class="nav-item">
+        Communaute
+      </a>
+    </div>
+
+    <!-- Auth Section -->
+    <div class="nav-auth">
+      <ng-container *ngIf="!currentUser">
+        <a routerLink="/login" class="btn-login">Connexion</a>
+        <a routerLink="/register" class="btn-signup">Inscription</a>
+      </ng-container>
+
+      <ng-container *ngIf="currentUser">
+        <a routerLink="/profile" class="user-profile">
+          <span class="user-avatar">{{ currentUser.firstName?.charAt(0) || currentUser.username?.charAt(0) }}</span>
+          <span class="user-name">{{ currentUser.firstName || currentUser.username }}</span>
+        </a>
+        <button (click)="logout()" class="btn-logout">Deconnexion</button>
+      </ng-container>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <button class="nav-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-logo">Travel2030</span>
+        <p>Planifiez vos voyages et partagez vos experiences avec une communaute de voyageurs passionnes.</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Navigation</h4>
+        <a routerLink="/">Accueil</a>
+        <a routerLink="/destinations">Destinations</a>
+        <a routerLink="/community">Communaute</a>
+      </div>
+
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <a href="#">Conditions d'utilisation</a>
+        <a href="#">Politique de confidentialite</a>
+      </div>
+
+      <div class="footer-links">
+        <h4>Contact</h4>
+        <a href="mailto:contact@travel2030.com">contact&#64;travel2030.com</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2030 Travel2030. Tous droits reserves.</p>
+    </div>
+  </div>
+</footer>
