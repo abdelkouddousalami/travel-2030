@@ -1,0 +1,249 @@
+<!-- ============================================================================
+     Register Page
+     ============================================================================ -->
+
+<div class="auth-container">
+  <div class="auth-card fade-in-up">
+    <div class="auth-header">
+      <h1 class="auth-title">INSCRIPTION</h1>
+      <p class="auth-subtitle">Créez votre compte Travel2030</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Error Alert -->
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Success Alert -->
+      <div *ngIf="successMessage" class="alert alert-success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        {{ successMessage }}
+      </div>
+
+      <!-- Name Fields Row -->
+      <div class="form-row-grid">
+        <div class="form-group">
+          <label for="firstName" class="form-label">Prénom</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('firstName')"
+            placeholder="Votre prénom"
+          />
+          <div *ngIf="isFieldInvalid('firstName')" class="invalid-feedback">
+            <span *ngIf="registerForm.get('firstName')?.errors?.['required']">
+              Le prénom est requis
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">Nom</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('lastName')"
+            placeholder="Votre nom"
+          />
+          <div *ngIf="isFieldInvalid('lastName')" class="invalid-feedback">
+            <span *ngIf="registerForm.get('lastName')?.errors?.['required']">
+              Le nom est requis
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="username" class="form-label">Nom d'utilisateur</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('username')"
+          placeholder="Choisissez un nom d'utilisateur"
+        />
+        <div *ngIf="isFieldInvalid('username')" class="invalid-feedback">
+          <span *ngIf="registerForm.get('username')?.errors?.['required']">
+            Le nom d'utilisateur est requis
+          </span>
+          <span *ngIf="registerForm.get('username')?.errors?.['minlength']">
+            Minimum 3 caractères requis
+          </span>
+          <span *ngIf="registerForm.get('username')?.errors?.['pattern']">
+            Uniquement lettres, chiffres et underscores (_)
+          </span>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('email')"
+          placeholder="votre@email.com"
+        />
+        <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">
+            L'email est requis
+          </span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">
+            Email invalide
+          </span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Mot de passe</label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('password')"
+            placeholder="Créez un mot de passe sécurisé"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePassword()"
+            tabindex="-1"
+          >
+            <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">
+            Le mot de passe est requis
+          </span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">
+            Minimum 8 caractères requis
+          </span>
+          <span *ngIf="registerForm.get('password')?.errors?.['pattern']">
+            Doit contenir: 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial (&#64;#$%^&+=)
+          </span>
+        </div>
+        <div *ngIf="!isFieldInvalid('password') && registerForm.get('password')?.value" class="password-strength">
+          <div class="strength-bar" [class]="getPasswordStrength()"></div>
+          <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('confirmPassword')"
+            placeholder="Confirmez votre mot de passe"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleConfirmPassword()"
+            tabindex="-1"
+          >
+            <svg *ngIf="!showConfirmPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showConfirmPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="isFieldInvalid('confirmPassword')" class="invalid-feedback">
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">
+            Veuillez confirmer votre mot de passe
+          </span>
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">
+            Les mots de passe ne correspondent pas
+          </span>
+        </div>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="acceptTerms" />
+          <span>
+            J'accepte les 
+            <a href="#" class="link">conditions d'utilisation</a> 
+            et la 
+            <a href="#" class="link">politique de confidentialité</a>
+          </span>
+        </label>
+        <div *ngIf="isFieldInvalid('acceptTerms')" class="invalid-feedback">
+          Vous devez accepter les conditions
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="!isLoading">Créer mon Compte</span>
+        <span *ngIf="isLoading" class="loading-spinner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+          </svg>
+          Création...
+        </span>
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="auth-divider">
+      <span>OU</span>
+    </div>
+
+    <!-- Login Link -->
+    <div class="auth-footer">
+      <p>Vous avez déjà un compte?</p>
+      <a routerLink="/login" class="btn btn-secondary btn-block">
+        Se Connecter
+      </a>
+    </div>
+  </div>
+
+  <!-- Decorative Background -->
+  <div class="auth-bg">
+    <div class="auth-bg-circle auth-bg-circle-1"></div>
+    <div class="auth-bg-circle auth-bg-circle-2"></div>
+  </div>
+</div>
