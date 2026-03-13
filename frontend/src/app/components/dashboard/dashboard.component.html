@@ -1,0 +1,246 @@
+<div class="dashboard">
+  <!-- Hero Header -->
+  <header class="hero-header">
+    <div class="hero-content">
+      <div class="greeting">
+        <span class="greeting-label">Bienvenue</span>
+        <h1 class="greeting-name">{{ currentUser?.firstName || currentUser?.username }}</h1>
+      </div>
+      <p class="greeting-subtitle">Pret pour votre prochaine aventure ?</p>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-hero" routerLink="/trips/new">
+        <span>+</span> Nouveau voyage
+      </button>
+      <button *ngIf="isAdmin" class="btn-admin" routerLink="/admin">
+        Administration
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats Row -->
+  <section class="stats-row">
+    <div class="stat-card" *ngFor="let stat of quickStats">
+      <div class="stat-number">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.label }}</div>
+      <div class="stat-badge" *ngIf="stat.trend">{{ stat.trend }}</div>
+    </div>
+  </section>
+
+  <!-- Quick Navigation -->
+  <section class="nav-section">
+    <div class="nav-grid">
+      <div
+        class="nav-card"
+        *ngFor="let card of mainCards"
+        (click)="navigateTo(card.route)"
+      >
+        <div class="nav-card-content">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+        </div>
+        <span class="nav-arrow">&rarr;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two Column Layout -->
+  <div class="main-content">
+    <!-- Left: Community Feed -->
+    <section class="feed-section">
+      <div class="section-header">
+        <h2>Communaute</h2>
+        <button class="btn-create" (click)="togglePostForm()">
+          {{ showPostForm ? 'Annuler' : '+ Publier' }}
+        </button>
+      </div>
+
+      <!-- Post Form -->
+      <div class="post-form" *ngIf="showPostForm">
+        <div class="form-row">
+          <div class="type-pills">
+            <button
+              class="pill"
+              [class.active]="newPost.type === 'announcement'"
+              (click)="newPost.type = 'announcement'"
+            >Annonce</button>
+            <button
+              class="pill"
+              [class.active]="newPost.type === 'advice'"
+              (click)="newPost.type = 'advice'"
+            >Conseil</button>
+            <button
+              class="pill"
+              [class.active]="newPost.type === 'post'"
+              (click)="newPost.type = 'post'"
+            >Post</button>
+          </div>
+        </div>
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="newPost.title"
+          placeholder="Titre de votre publication..."
+        />
+        <textarea
+          class="textarea-field"
+          [(ngModel)]="newPost.content"
+          placeholder="Partagez quelque chose..."
+          rows="3"
+        ></textarea>
+        <button
+          class="btn-publish"
+          (click)="submitPost()"
+          [disabled]="isSubmitting || !newPost.title.trim() || !newPost.content.trim()"
+        >
+          {{ isSubmitting ? 'Publication...' : 'Publier' }}
+        </button>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <button
+          class="filter-btn"
+          [class.active]="activeFilter === 'all'"
+          (click)="filterPosts('all')"
+        >Tous</button>
+        <button
+          class="filter-btn"
+          [class.active]="activeFilter === 'announcement'"
+          (click)="filterPosts('announcement')"
+        >Annonces</button>
+        <button
+          class="filter-btn"
+          [class.active]="activeFilter === 'advice'"
+          (click)="filterPosts('advice')"
+        >Conseils</button>
+        <button
+          class="filter-btn"
+          [class.active]="activeFilter === 'post'"
+          (click)="filterPosts('post')"
+        >Posts</button>
+      </div>
+
+      <!-- Posts -->
+      <div class="posts-list">
+        <article class="post" *ngFor="let post of filteredPosts">
+          <div class="post-top">
+            <div class="author">
+              <div class="avatar">{{ post.authorInitials }}</div>
+              <div class="author-info">
+                <span class="author-name">{{ post.authorName }}</span>
+                <span class="post-time">{{ getTimeAgo(post.createdAt) }}</span>
+              </div>
+            </div>
+            <div class="post-badges">
+              <span class="type-badge" [attr.data-type]="post.type">
+                {{ getPostTypeLabel(post.type) }}
+              </span>
+              <button
+                class="btn-delete"
+                *ngIf="canEditPost(post)"
+                (click)="deletePost(post)"
+              >x</button>
+            </div>
+          </div>
+
+          <div class="post-body">
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.content }}</p>
+          </div>
+
+          <div class="post-footer">
+            <button
+              class="action-btn"
+              [class.liked]="post.likedByCurrentUser"
+              (click)="toggleLike(post)"
+            >
+              <span *ngIf="post.likedByCurrentUser">&#9829;</span>
+              <span *ngIf="!post.likedByCurrentUser">&#9825;</span>
+              {{ post.likes }}
+            </button>
+            <button class="action-btn" (click)="toggleComments(post)">
+              <span>&#9993;</span> {{ post.commentsCount }}
+            </button>
+          </div>
+
+          <!-- Comments -->
+          <div class="comments" *ngIf="post.showComments">
+            <div class="comment" *ngFor="let comment of post.comments">
+              <div class="comment-top">
+                <div class="comment-author">
+                  <span class="comment-avatar">{{ comment.authorInitials }}</span>
+                  <span class="comment-name">{{ comment.authorName }}</span>
+                </div>
+                <div class="comment-meta">
+                  <button
+                    class="btn-like-sm"
+                    [class.liked]="comment.likedByCurrentUser"
+                    (click)="toggleCommentLike(post, comment)"
+                  >&#9829; {{ comment.likes }}</button>
+                  <button
+                    class="btn-delete-sm"
+                    *ngIf="canEditComment(comment)"
+                    (click)="deleteComment(post, comment)"
+                  >x</button>
+                </div>
+              </div>
+              <p class="comment-text">{{ comment.content }}</p>
+            </div>
+
+            <div class="comment-form">
+              <input
+                type="text"
+                [(ngModel)]="newCommentContent[post.id]"
+                placeholder="Ajouter un commentaire..."
+                (keyup.enter)="submitComment(post)"
+              />
+              <button
+                (click)="submitComment(post)"
+                [disabled]="!(newCommentContent[post.id] || '').trim()"
+              >&rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <div class="empty-state" *ngIf="filteredPosts.length === 0">
+          <p>Aucune publication. Soyez le premier a partager !</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Activities -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Activite recente</h3>
+        <div class="activity-list" *ngIf="recentActivities.length > 0">
+          <div class="activity" *ngFor="let activity of recentActivities">
+            <div class="activity-dot"></div>
+            <div class="activity-info">
+              <span class="activity-title">{{ activity.title }}</span>
+              <span class="activity-time">{{ getTimeAgo(activity.date) }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="empty-small" *ngIf="recentActivities.length === 0">
+          <p>Aucune activite recente</p>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Actions rapides</h3>
+        <div class="quick-actions">
+          <button class="quick-btn" routerLink="/trips/new">
+            <span>+</span> Creer un voyage
+          </button>
+          <button class="quick-btn" routerLink="/destinations">
+            <span>&#9906;</span> Explorer
+          </button>
+          <button class="quick-btn" routerLink="/bookings">
+            <span>&#9745;</span> Mes reservations
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
