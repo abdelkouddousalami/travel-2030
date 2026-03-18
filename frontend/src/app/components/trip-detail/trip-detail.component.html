@@ -1,0 +1,123 @@
+<div class="detail-container">
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="!isLoading && trip" class="trip-detail fade-in">
+    <!-- Back button -->
+    <a routerLink="/trips" class="back-link">&larr; Retour aux voyages</a>
+
+    <!-- Trip Header -->
+    <header class="trip-header">
+      <div class="header-top">
+        <span class="status-badge" [attr.data-status]="trip.status">
+          {{ getStatusLabel(trip.status) }}
+        </span>
+        <span class="visibility-badge">
+          {{ trip.isPublic ? 'Public' : 'Privé' }}
+        </span>
+      </div>
+
+      <h1 class="trip-title">{{ trip.title }}</h1>
+
+      <div class="trip-meta">
+        <div class="meta-item">
+          <span class="meta-icon">&#9906;</span>
+          <span>{{ trip.destination }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">&#9776;</span>
+          <span>{{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}</span>
+        </div>
+        <div class="meta-item" *ngIf="getDuration() > 0">
+          <span class="meta-icon">&#8987;</span>
+          <span>{{ getDuration() }} jours</span>
+        </div>
+        <div class="meta-item" *ngIf="trip.budget">
+          <span class="meta-icon">&#9733;</span>
+          <span>{{ trip.budget | number:'1.0-2' }} EUR</span>
+        </div>
+      </div>
+
+      <div class="trip-author" *ngIf="trip.user">
+        <div class="author-avatar">{{ getInitials(trip.user) }}</div>
+        <div class="author-info">
+          <span class="author-name">{{ trip.user.firstName }} {{ trip.user.lastName }}</span>
+          <span class="author-date">Créé le {{ formatDate(trip.createdAt) }}</span>
+        </div>
+      </div>
+
+      <!-- Owner actions -->
+      <div class="owner-actions" *ngIf="isOwner()">
+        <a [routerLink]="['/trips', trip.id, 'edit']" class="btn-edit">Modifier</a>
+        <button class="btn-delete" (click)="deleteTrip()">Supprimer</button>
+      </div>
+    </header>
+
+    <!-- Description -->
+    <section class="trip-description" *ngIf="trip.description">
+      <h2 class="section-title">Description</h2>
+      <p class="description-text">{{ trip.description }}</p>
+    </section>
+
+    <!-- Social Actions -->
+    <section class="social-section">
+      <div class="social-actions">
+        <button class="social-btn" [class.liked]="trip.isLikedByCurrentUser" (click)="toggleLike()">
+          {{ trip.isLikedByCurrentUser ? '[LIKED]' : '[LIKE]' }}
+          <span class="count">{{ trip.likesCount }}</span>
+        </button>
+        <span class="social-stat">
+          {{ trip.commentsCount }} commentaire{{ trip.commentsCount !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </section>
+
+    <!-- Comments Section -->
+    <section class="comments-section">
+      <h2 class="section-title">Commentaires ({{ trip.commentsCount }})</h2>
+
+      <!-- Add Comment -->
+      <div class="add-comment" *ngIf="currentUser">
+        <div class="comment-avatar">{{ getInitials(currentUser) }}</div>
+        <div class="comment-form">
+          <input
+            type="text"
+            class="comment-input"
+            [(ngModel)]="newComment"
+            placeholder="Écrire un commentaire..."
+            (keyup.enter)="submitComment()"
+          />
+          <button class="comment-submit" (click)="submitComment()" [disabled]="isSubmitting || !newComment.trim()">
+            {{ isSubmitting ? '...' : 'Envoyer' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Comments List -->
+      <div class="comments-list">
+        <div class="comment-item" *ngFor="let comment of comments">
+          <div class="comment-avatar">{{ getInitials(comment.user) }}</div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-author">{{ comment.user.firstName }} {{ comment.user.lastName }}</span>
+              <span class="comment-time">{{ getTimeAgo(comment.createdAt) }}</span>
+              <button
+                class="comment-delete"
+                *ngIf="canDeleteComment(comment)"
+                (click)="deleteComment(comment)"
+              >[X]</button>
+            </div>
+            <p class="comment-content">{{ comment.content }}</p>
+          </div>
+        </div>
+
+        <div class="empty-comments" *ngIf="comments.length === 0">
+          <p>Aucun commentaire pour le moment. Soyez le premier !</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

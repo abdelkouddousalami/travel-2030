@@ -1,0 +1,127 @@
+<div class="trips-container">
+  <!-- Header -->
+  <header class="trips-header fade-in">
+    <div class="header-content">
+      <h1 class="page-title">Mes Voyages</h1>
+      <p class="page-subtitle">Gérez et organisez tous vos voyages</p>
+    </div>
+    <button class="create-btn" routerLink="/trips/new">
+      <span class="btn-icon">+</span>
+      Nouveau Voyage
+    </button>
+  </header>
+
+  <!-- Filters -->
+  <div class="filters-bar slide-up">
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'all'"
+      (click)="filterTrips('all')"
+    >
+      Tous
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'planning'"
+      (click)="filterTrips('planning')"
+    >
+      En Planification
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'confirmed'"
+      (click)="filterTrips('confirmed')"
+    >
+      Confirmés
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'completed'"
+      (click)="filterTrips('completed')"
+    >
+      Terminés
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Trips Grid -->
+  <div class="trips-grid" *ngIf="!isLoading && filteredTrips.length > 0">
+    <div 
+      class="trip-card" 
+      *ngFor="let trip of filteredTrips; let i = index"
+      [style.animation-delay]="(i * 0.1) + 's'"
+    >
+      <div class="trip-header">
+        <div class="trip-status" [attr.data-status]="trip.status.toUpperCase()">
+          {{ getStatusLabel(trip.status) }}
+        </div>
+        <div class="trip-actions">
+          <a class="action-icon" [routerLink]="['/trips', trip.id, 'edit']" title="Modifier">&#9998;</a>
+          <button class="action-icon" (click)="deleteTrip(trip.id)" title="Supprimer">&#10005;</button>
+        </div>
+      </div>
+
+      <div class="trip-content">
+        <h3 class="trip-title">{{ trip.title }}</h3>
+        <div class="trip-destination">
+          <span class="icon">&#9906;</span>
+          {{ trip.destination }}
+        </div>
+
+        <div class="trip-details">
+          <div class="detail-item">
+            <span class="icon">&#9776;</span>
+            <div class="detail-text">
+              <div class="detail-label">Départ</div>
+              <div class="detail-value">{{ formatDate(trip.startDate) }}</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <span class="icon">&#8866;</span>
+            <div class="detail-text">
+              <div class="detail-label">Retour</div>
+              <div class="detail-value">{{ formatDate(trip.endDate) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="trip-footer">
+          <div class="trip-duration">
+            <span class="icon">&#8987;</span>
+            {{ getDuration(trip.startDate, trip.endDate) }} jours
+          </div>
+          <div class="trip-budget">
+            <span class="icon">&#9733;</span>
+            {{ trip.budget }}€
+          </div>
+        </div>
+      </div>
+
+      <a class="view-btn" [routerLink]="['/trips', trip.id]">
+        Voir les détails
+        <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredTrips.length === 0">
+    <div class="empty-icon">&#9992;</div>
+    <h3 class="empty-title">Aucun voyage</h3>
+    <p class="empty-text">
+      {{ selectedFilter === 'all' 
+        ? 'Commencez à planifier votre première aventure!'
+        : 'Aucun voyage avec ce statut.'
+      }}
+    </p>
+    <button class="create-btn-empty" routerLink="/trips/new">
+      <span class="btn-icon">+</span>
+      Créer un Voyage
+    </button>
+  </div>
+</div>

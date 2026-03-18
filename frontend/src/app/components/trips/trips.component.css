@@ -1,0 +1,454 @@
+/* ============================================================================
+   TRIPS PAGE - Classic Black & White Design
+   ============================================================================ */
+
+.trips-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.trips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0 3rem;
+  border-bottom: 3px solid #000;
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0;
+}
+
+.create-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.create-btn:hover {
+  background: #333;
+  transform: translateY(-3px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.btn-icon {
+  font-size: 1.25rem;
+}
+
+/* ============================================================================
+   FILTERS BAR
+   ============================================================================ */
+
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 2rem;
+}
+
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  color: #666;
+  border: 2px solid #ddd;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  border-color: #000;
+  color: #000;
+}
+
+.filter-btn.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* ============================================================================
+   LOADING
+   ============================================================================ */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f0f0f0;
+  border-top: 4px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ============================================================================
+   TRIPS GRID
+   ============================================================================ */
+
+.trips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.trip-card {
+  background: #fff;
+  border: 3px solid #000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideUp 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 12px 12px 0 #000;
+}
+
+.trip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid #000;
+  background: #fafafa;
+}
+
+.trip-status {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid #000;
+}
+
+.trip-status[data-status="PLANNING"] {
+  background: #fff;
+  color: #000;
+}
+
+.trip-status[data-status="CONFIRMED"] {
+  background: #000;
+  color: #fff;
+}
+
+.trip-status[data-status="COMPLETED"] {
+  background: #666;
+  color: #fff;
+  border-color: #666;
+}
+
+.trip-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #000;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.action-icon:hover {
+  background: #000;
+  transform: scale(1.1);
+}
+
+.trip-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.trip-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trip-destination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.trip-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.detail-item .icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.detail-text {
+  flex: 1;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.trip-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.trip-duration,
+.trip-budget {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.icon {
+  font-size: 1.125rem;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1.25rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-top: 3px solid #000;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.view-btn:hover {
+  background: #333;
+}
+
+.view-btn .arrow {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.view-btn:hover .arrow {
+  transform: translateX(5px);
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  border: 3px dashed #ddd;
+  background: #fafafa;
+}
+
+.empty-icon {
+  font-size: 6rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.3;
+}
+
+.empty-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.empty-text {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0 0 2rem 0;
+  max-width: 500px;
+}
+
+.create-btn-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: #000;
+  color: #fff;
+  border: 3px solid #000;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.create-btn-empty:hover {
+  background: #333;
+  transform: translateY(-3px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.8s ease-out;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .trips-container {
+    padding: 1rem;
+  }
+
+  .trips-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .filters-bar {
+    flex-wrap: wrap;
+  }
+
+  .trips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-details {
+    grid-template-columns: 1fr;
+  }
+}

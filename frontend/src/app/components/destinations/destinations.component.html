@@ -1,0 +1,84 @@
+<div class="destinations-container">
+  <!-- Header -->
+  <header class="page-header fade-in">
+    <h1 class="page-title">Destinations</h1>
+    <p class="page-subtitle">Explorez les plus belles destinations du monde</p>
+  </header>
+
+  <!-- Search & Filters -->
+  <div class="search-section slide-up">
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        [(ngModel)]="searchKeyword"
+        placeholder="Rechercher une destination..."
+        (keyup.enter)="onSearch()"
+      />
+      <button class="search-btn" (click)="onSearch()">Rechercher</button>
+    </div>
+
+    <div class="category-filters">
+      <button
+        *ngFor="let cat of categories"
+        class="category-btn"
+        [class.active]="selectedCategory === cat.value"
+        (click)="onCategoryChange(cat.value)"
+      >
+        {{ cat.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des destinations...</p>
+  </div>
+
+  <!-- Results count -->
+  <div class="results-info" *ngIf="!isLoading && destinations.length > 0">
+    <p>{{ totalElements }} destination{{ totalElements > 1 ? 's' : '' }} trouvée{{ totalElements > 1 ? 's' : '' }}</p>
+  </div>
+
+  <!-- Destinations Grid -->
+  <div class="destinations-grid" *ngIf="!isLoading && destinations.length > 0">
+    <div
+      class="destination-card"
+      *ngFor="let dest of destinations; let i = index"
+      [style.animation-delay]="(i * 0.05) + 's'"
+    >
+      <div class="card-image" [style.background-image]="'url(' + getDefaultImage(dest) + ')'">
+        <span class="card-category">{{ getCategoryLabel(dest.category) }}</span>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">{{ dest.name }}</h3>
+        <div class="card-location">{{ dest.city }}, {{ dest.country }}</div>
+        <p class="card-description" *ngIf="dest.description">
+          {{ dest.description | slice:0:100 }}{{ dest.description.length > 100 ? '...' : '' }}
+        </p>
+        <div class="card-footer">
+          <div class="card-price">
+            <span class="price-value">{{ dest.pricePerNight | number:'1.0-0' }} EUR</span>
+            <span class="price-label">/ nuit</span>
+          </div>
+          <a [routerLink]="['/destinations', dest.id]" class="card-link">Voir &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 0">&larr; Précédent</button>
+    <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button class="page-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Suivant &rarr;</button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && destinations.length === 0">
+    <div class="empty-icon">&#9906;</div>
+    <h3>Aucune destination trouvée</h3>
+    <p>Essayez une autre recherche ou catégorie.</p>
+  </div>
+</div>
