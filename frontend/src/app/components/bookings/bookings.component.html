@@ -1,0 +1,90 @@
+<div class="bookings-container">
+  <header class="page-header fade-in">
+    <h1 class="page-title">Mes Réservations</h1>
+    <p class="page-subtitle">Gérez toutes vos réservations</p>
+  </header>
+
+  <!-- Status Filters -->
+  <div class="filters-bar slide-up">
+    <button
+      *ngFor="let s of statuses"
+      class="filter-btn"
+      [class.active]="statusFilter === s.value"
+      (click)="filterByStatus(s.value)"
+    >
+      {{ s.label }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Bookings List -->
+  <div class="bookings-list" *ngIf="!isLoading && filteredBookings.length > 0">
+    <div
+      class="booking-card"
+      *ngFor="let booking of filteredBookings; let i = index"
+      [style.animation-delay]="(i * 0.05) + 's'"
+    >
+      <div class="booking-header">
+        <h3 class="booking-dest">{{ booking.destinationName }}</h3>
+        <span class="booking-status" [attr.data-status]="booking.status">
+          {{ statusLabels[booking.status] }}
+        </span>
+      </div>
+
+      <div class="booking-details">
+        <div class="detail-row">
+          <span class="detail-label">Dates</span>
+          <span class="detail-value">{{ formatDate(booking.startDate) }} - {{ formatDate(booking.endDate) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Durée</span>
+          <span class="detail-value">{{ getDuration(booking.startDate, booking.endDate) }} nuits</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Prix total</span>
+          <span class="detail-value price">{{ booking.totalPrice | number:'1.0-2' }} EUR</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Réservé le</span>
+          <span class="detail-value">{{ formatDate(booking.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button
+          class="btn-cancel-booking"
+          *ngIf="booking.status === 'PENDING' || booking.status === 'CONFIRMED'"
+          (click)="cancelBooking(booking)"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn-delete-booking"
+          *ngIf="booking.status === 'CANCELLED'"
+          (click)="deleteBooking(booking)"
+        >
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 0">&larr;</button>
+    <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button class="page-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">&rarr;</button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredBookings.length === 0">
+    <h3>Aucune réservation</h3>
+    <p>Explorez nos destinations et réservez votre prochain séjour.</p>
+    <a routerLink="/destinations" class="btn-explore">Explorer les Destinations</a>
+  </div>
+</div>

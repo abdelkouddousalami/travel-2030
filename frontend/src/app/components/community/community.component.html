@@ -1,0 +1,70 @@
+<div class="community-container">
+  <header class="page-header fade-in">
+    <h1 class="page-title">Communauté</h1>
+    <p class="page-subtitle">Découvrez les voyages partagés par les membres</p>
+  </header>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Trips Feed -->
+  <div class="trips-feed" *ngIf="!isLoading && publicTrips.length > 0">
+    <div
+      class="trip-card"
+      *ngFor="let trip of publicTrips; let i = index"
+      [style.animation-delay]="(i * 0.05) + 's'"
+    >
+      <!-- Author -->
+      <div class="card-author">
+        <div class="author-avatar">{{ getInitials(trip.user) }}</div>
+        <div class="author-info">
+          <span class="author-name">{{ trip.user.firstName }} {{ trip.user.lastName }}</span>
+          <span class="post-time">{{ getTimeAgo(trip.createdAt) }}</span>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="card-content">
+        <h3 class="card-title">
+          <a [routerLink]="['/trips', trip.id]">{{ trip.title }}</a>
+        </h3>
+        <div class="card-destination">{{ trip.destination }}</div>
+        <p class="card-description" *ngIf="trip.description">
+          {{ trip.description | slice:0:200 }}{{ trip.description.length > 200 ? '...' : '' }}
+        </p>
+        <div class="card-meta">
+          <span>{{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}</span>
+          <span *ngIf="trip.budget">{{ trip.budget | number:'1.0-0' }} EUR</span>
+        </div>
+      </div>
+
+      <!-- Social Actions -->
+      <div class="card-actions">
+        <button
+          class="action-btn"
+          [class.liked]="trip.isLikedByCurrentUser"
+          (click)="toggleLike(trip)"
+          [disabled]="!currentUser"
+        >
+          {{ trip.isLikedByCurrentUser ? '[LIKED]' : '[LIKE]' }}
+          <span class="count">{{ trip.likesCount }}</span>
+        </button>
+        <a [routerLink]="['/trips', trip.id]" class="action-btn">
+          [COMMENT] <span class="count">{{ trip.commentsCount }}</span>
+        </a>
+        <a [routerLink]="['/trips', trip.id]" class="view-link">Voir les détails &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && publicTrips.length === 0">
+    <h3>Aucun voyage public</h3>
+    <p>Soyez le premier à partager un voyage avec la communauté !</p>
+    <a routerLink="/trips/new" class="btn-create" *ngIf="currentUser">Créer un Voyage Public</a>
+    <a routerLink="/register" class="btn-create" *ngIf="!currentUser">Rejoindre la Communauté</a>
+  </div>
+</div>

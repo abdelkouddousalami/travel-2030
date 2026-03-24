@@ -1,0 +1,61 @@
+<div class="profile-container">
+  <div class="profile-card fade-in" *ngIf="user">
+    <div class="profile-header">
+      <div class="avatar-large">{{ getInitials() }}</div>
+      <div class="profile-info">
+        <h1 class="profile-name">{{ getFullName() }}</h1>
+        <p class="profile-username">&#64;{{ user.username }}</p>
+        <p class="profile-email">{{ user.email }}</p>
+        <span class="profile-role">{{ user.role }}</span>
+      </div>
+    </div>
+
+    <div class="stats-grid slide-up">
+      <div class="stat-card">
+        <div class="stat-value">{{ myTrips.length }}</div>
+        <div class="stat-label">Voyages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ bookingsCount }}</div>
+        <div class="stat-label">Réservations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ myTrips.length > 0 ? (myTrips | slice:0:myTrips.length).length : 0 }}</div>
+        <div class="stat-label">Destinations</div>
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <a routerLink="/trips" class="link-card">
+        <span class="link-icon">[TRIP]</span>
+        <span>Mes Voyages</span>
+      </a>
+      <a routerLink="/bookings" class="link-card">
+        <span class="link-icon">[BOOK]</span>
+        <span>Mes Réservations</span>
+      </a>
+      <a routerLink="/destinations" class="link-card">
+        <span class="link-icon">[DEST]</span>
+        <span>Destinations</span>
+      </a>
+    </div>
+
+    <!-- Recent Trips -->
+    <section class="recent-section" *ngIf="myTrips.length > 0">
+      <h2 class="section-title">Derniers Voyages</h2>
+      <div class="recent-list">
+        <a
+          *ngFor="let trip of myTrips | slice:0:5"
+          [routerLink]="['/trips', trip.id]"
+          class="recent-item"
+        >
+          <div class="recent-info">
+            <span class="recent-title">{{ trip.title }}</span>
+            <span class="recent-dest">{{ trip.destination }}</span>
+          </div>
+          <span class="recent-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>
