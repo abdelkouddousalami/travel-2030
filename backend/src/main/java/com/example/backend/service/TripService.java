@@ -16,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,6 +90,12 @@ public class TripService {
         return trips.stream()
                 .map(trip -> mapToResponse(trip, currentUser))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TripResponse> getAllTripsAdmin(Pageable pageable) {
+        return tripRepository.findAll(pageable)
+                .map(trip -> mapToResponse(trip, null));
     }
 
     @Transactional(readOnly = true)

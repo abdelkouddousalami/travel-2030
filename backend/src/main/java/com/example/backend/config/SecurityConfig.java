@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/likes/**").authenticated()
                         .requestMatchers("/api/activities/**").authenticated()
                         .requestMatchers("/api/users/profile/**").authenticated()
+                        .requestMatchers("/api/chat/**").authenticated()
                         
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/destinations/**").hasRole("ADMIN")

@@ -21,4 +21,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByStatus(Booking.Status status, Pageable pageable);
     
     List<Booking> findByUserOrderByCreatedAtDesc(User user);
+
+    Long countByStatus(Booking.Status status);
 }
