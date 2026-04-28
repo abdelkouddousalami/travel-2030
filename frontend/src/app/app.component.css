@@ -80,6 +80,26 @@
   font-weight: 600;
 }
 
+.nav-item-admin {
+  background: #1a1a2e;
+  color: #fff !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+}
+
+.nav-item-admin:hover {
+  background: #2d2d44 !important;
+  color: #fff !important;
+}
+
+.nav-item-admin.active {
+  background: #000 !important;
+  color: #fff !important;
+}
+
 /* Auth Section */
 .nav-auth {
   display: flex;

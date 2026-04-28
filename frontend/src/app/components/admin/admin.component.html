@@ -1,0 +1,670 @@
+<div class="admin-wrapper">
+
+  <!-- TOP HEADER -->
+  <header class="admin-header">
+    <div class="header-left">
+      <span class="admin-badge">ADMIN</span>
+      <div class="header-titles">
+        <h1>Panneau d'Administration</h1>
+        <p>Travel2030 - Vue complete du systeme</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="current-user">
+        {{ currentUser?.firstName || currentUser?.username }}
+      </span>
+      <a routerLink="/dashboard" class="back-btn">&larr; Dashboard</a>
+    </div>
+  </header>
+
+  <!-- STATS ROW -->
+  <section class="stats-row" *ngIf="stats">
+    <div class="stat-box">
+      <div class="stat-value">{{ stats.totalUsers }}</div>
+      <div class="stat-label">Utilisateurs</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{ stats.totalTrips }}</div>
+      <div class="stat-label">Voyages</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{ stats.totalDestinations }}</div>
+      <div class="stat-label">Destinations</div>
+    </div>
+    <div class="stat-box highlight">
+      <div class="stat-value">{{ stats.totalBookings }}</div>
+      <div class="stat-label">Réservations</div>
+      <div class="stat-sub">{{ stats.pendingBookings }} en attente</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{ stats.totalMessages }}</div>
+      <div class="stat-label">Messages</div>
+    </div>
+    <div class="stat-box success">
+      <div class="stat-value">{{ stats.confirmedBookings }}</div>
+      <div class="stat-label">Confirmées</div>
+    </div>
+    <div class="stat-box danger">
+      <div class="stat-value">{{ stats.cancelledBookings }}</div>
+      <div class="stat-label">Annulées</div>
+    </div>
+  </section>
+
+  <!-- Stats skeleton -->
+  <section class="stats-row" *ngIf="!stats">
+    <div class="stat-box skeleton" *ngFor="let i of [1,2,3,4,5,6,7]">
+      <div class="skel-val"></div>
+      <div class="skel-lbl"></div>
+    </div>
+  </section>
+
+  <!-- TAB NAV -->
+  <nav class="tab-nav">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'dashboard'"
+      (click)="setTab('dashboard')"
+    >
+      Tableau de bord
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'reservations'"
+      (click)="setTab('reservations')"
+    >
+      Réservations
+      <span class="tab-count" *ngIf="stats">{{ stats.totalBookings }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'trips'"
+      (click)="setTab('trips')"
+    >
+      Voyages
+      <span class="tab-count" *ngIf="stats">{{ stats.totalTrips }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'users'"
+      (click)="setTab('users')"
+    >
+      Utilisateurs
+      <span class="tab-count" *ngIf="stats">{{ stats.totalUsers }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'comments'"
+      (click)="setTab('comments')"
+    >
+      Commentaires
+      <span class="tab-count">{{ commentsTotalElements }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'messages'"
+      (click)="setTab('messages')"
+    >
+      Messages &amp; Conversations
+      <span class="tab-count" *ngIf="stats">{{ stats.totalMessages }}</span>
+    </button>
+  </nav>
+
+  <!-- TAB 0: DASHBOARD -->
+  <section class="tab-content dashboard-tab" *ngIf="activeTab === 'dashboard'">
+
+    <div class="charts-grid">
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Réservations par statut</h3>
+          <span class="chart-card-sub">Total : {{ stats?.totalBookings || 0 }}</span>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [type]="bookingsChartType"
+            [data]="bookingsChartData"
+            [options]="chartOptions">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Voyages par statut</h3>
+          <span class="chart-card-sub">Total : {{ tripsTotalElements }}</span>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [type]="tripsChartType"
+            [data]="tripsChartData"
+            [options]="barChartOptions">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Utilisateurs par rôle</h3>
+          <span class="chart-card-sub">Total : {{ users.length }}</span>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas baseChart
+            [type]="usersChartType"
+            [data]="usersChartData"
+            [options]="chartOptions">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card-wide">
+        <div class="chart-card-header">
+          <h3>Activité globale</h3>
+          <span class="chart-card-sub">Vue rapide</span>
+        </div>
+        <div class="dashboard-summary">
+          <div class="summary-item">
+            <span class="summary-label">Voyages publics</span>
+            <span class="summary-value">{{ getPublicTripsCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Voyages privés</span>
+            <span class="summary-value">{{ getPrivateTripsCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Utilisateurs vérifiés</span>
+            <span class="summary-value">{{ getVerifiedUsersCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Utilisateurs actifs</span>
+            <span class="summary-value">{{ getActiveUsersCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Commentaires</span>
+            <span class="summary-value">{{ commentsTotalElements }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Messages</span>
+            <span class="summary-value">{{ stats?.totalMessages || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- TAB 1: RESERVATIONS -->
+  <section class="tab-content" *ngIf="activeTab === 'reservations'">
+
+    <!-- Filters -->
+    <div class="toolbar">
+      <div class="filter-pills">
+        <button
+          class="pill"
+          *ngFor="let s of statusOptions"
+          [class.active]="statusFilter === s.value"
+          (click)="filterByStatus(s.value)"
+        >{{ s.label }}</button>
+      </div>
+      <span class="results-count">
+        {{ filteredBookings.length }} / {{ bookingsTotalElements }} réservation(s)
+      </span>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-row" *ngIf="isLoadingBookings">
+      <div class="spinner"></div>
+      <span>Chargement des réservations...</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!isLoadingBookings">
+      <table class="data-table" *ngIf="filteredBookings.length > 0">
+        <thead>
+          <tr>
+            <th>#ID</th>
+            <th>Utilisateur</th>
+            <th>Destination</th>
+            <th>Arrivée</th>
+            <th>Départ</th>
+            <th>Durée</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th>Réservé le</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of filteredBookings" [class.updating]="updatingBookingId === b.id">
+            <td class="id-cell">{{ b.id }}</td>
+            <td class="user-cell">
+              <div class="user-info">
+                <span class="avatar-sm">{{ b.username ? b.username[0].toUpperCase() : '?' }}</span>
+                <span>{{ b.username }}</span>
+              </div>
+            </td>
+            <td class="dest-cell">{{ b.destinationName }}</td>
+            <td>{{ formatDate(b.startDate) }}</td>
+            <td>{{ formatDate(b.endDate) }}</td>
+            <td class="center">{{ getDuration(b.startDate, b.endDate) }} j</td>
+            <td class="price-cell">{{ b.totalPrice | number:'1.0-2' }} EUR</td>
+            <td>
+              <span class="status-badge" [attr.data-status]="b.status">
+                {{ statusLabels[b.status] }}
+              </span>
+            </td>
+            <td class="date-sm">{{ formatDate(b.createdAt) }}</td>
+            <td class="action-cell">
+              <select
+                class="status-select"
+                [value]="b.status"
+                (change)="changeBookingStatus(b, $any($event.target).value)"
+                [disabled]="updatingBookingId === b.id"
+              >
+                <option *ngFor="let opt of changeableStatuses" [value]="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="filteredBookings.length === 0">
+        <div class="empty-icon">[ ]</div>
+        <p>Aucune réservation trouvée pour ce filtre.</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="bookingsTotalPages > 1 && !isLoadingBookings">
+      <button class="page-btn" (click)="prevPage()" [disabled]="bookingsPage === 0">
+        &larr; Précédent
+      </button>
+      <span class="page-info">
+        Page {{ bookingsPage + 1 }} / {{ bookingsTotalPages }}
+      </span>
+      <button class="page-btn" (click)="nextPage()" [disabled]="bookingsPage >= bookingsTotalPages - 1">
+        Suivant &rarr;
+      </button>
+    </div>
+
+  </section>
+
+  <!-- TAB 2: VOYAGES -->
+  <section class="tab-content" *ngIf="activeTab === 'trips'">
+
+    <div class="toolbar">
+      <div class="filter-pills">
+        <button
+          class="pill"
+          *ngFor="let s of tripStatusOptions"
+          [class.active]="tripStatusFilter === s.value"
+          (click)="tripStatusFilter = s.value"
+        >{{ s.label }}</button>
+      </div>
+      <span class="results-count">
+        {{ filteredTrips.length }} / {{ tripsTotalElements }} voyage(s)
+      </span>
+    </div>
+
+    <div class="loading-row" *ngIf="isLoadingTrips">
+      <div class="spinner"></div>
+      <span>Chargement des voyages...</span>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!isLoadingTrips">
+      <table class="data-table" *ngIf="filteredTrips.length > 0">
+        <thead>
+          <tr>
+            <th>#ID</th>
+            <th>Titre</th>
+            <th>Destination</th>
+            <th>Utilisateur</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th>Budget</th>
+            <th>Statut</th>
+            <th>Visibilité</th>
+            <th>Créé le</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of filteredTrips">
+            <td class="id-cell">{{ t.id }}</td>
+            <td class="trip-title-cell">{{ t.title }}</td>
+            <td>{{ t.destination || '—' }}</td>
+            <td class="user-cell">
+              <div class="user-info">
+                <span class="avatar-sm">{{ t.user && t.user.username ? t.user.username[0].toUpperCase() : '?' }}</span>
+                <span>{{ t.user ? t.user.username : '—' }}</span>
+              </div>
+            </td>
+            <td>{{ t.startDate ? formatDate(t.startDate) : '—' }}</td>
+            <td>{{ t.endDate ? formatDate(t.endDate) : '—' }}</td>
+            <td class="price-cell">{{ formatBudget(t.budget) }}</td>
+            <td>
+              <span class="status-badge" [attr.data-trip-status]="t.status">
+                {{ getTripStatusLabel(t.status) }}
+              </span>
+            </td>
+            <td>
+              <span class="visibility-badge" [class.public]="t.isPublic" [class.private]="!t.isPublic">
+                {{ t.isPublic ? 'Public' : 'Privé' }}
+              </span>
+            </td>
+            <td class="date-sm">{{ formatDate(t.createdAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="filteredTrips.length === 0">
+        <div class="empty-icon">[ ]</div>
+        <p>Aucun voyage trouvé pour ce filtre.</p>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="tripsTotalPages > 1 && !isLoadingTrips">
+      <button class="page-btn" (click)="prevTripsPage()" [disabled]="tripsPage === 0">
+        &larr; Précédent
+      </button>
+      <span class="page-info">Page {{ tripsPage + 1 }} / {{ tripsTotalPages }}</span>
+      <button class="page-btn" (click)="nextTripsPage()" [disabled]="tripsPage >= tripsTotalPages - 1">
+        Suivant &rarr;
+      </button>
+    </div>
+
+  </section>
+
+  <!-- TAB 3: UTILISATEURS -->
+  <section class="tab-content" *ngIf="activeTab === 'users'">
+
+    <div class="toolbar">
+      <div class="search-inline">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par nom, email, username..."
+          [(ngModel)]="userSearch"
+        />
+      </div>
+      <span class="results-count">{{ filteredUsers.length }} utilisateur(s)</span>
+    </div>
+
+    <div class="loading-row" *ngIf="isLoadingUsers">
+      <div class="spinner"></div>
+      <span>Chargement des utilisateurs...</span>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!isLoadingUsers">
+      <table class="data-table" *ngIf="filteredUsers.length > 0">
+        <thead>
+          <tr>
+            <th>#ID</th>
+            <th>Utilisateur</th>
+            <th>Email</th>
+            <th>Nom complet</th>
+            <th>Rôle</th>
+            <th>Vérifié</th>
+            <th>Statut</th>
+            <th>Inscrit le</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filteredUsers">
+            <td class="id-cell">{{ u.id }}</td>
+            <td class="user-cell">
+              <div class="user-info">
+                <span class="avatar-sm">{{ u.username ? u.username[0].toUpperCase() : '?' }}</span>
+                <span>{{ u.username }}</span>
+              </div>
+            </td>
+            <td class="email-cell">{{ u.email }}</td>
+            <td>{{ getFullName(u) }}</td>
+            <td>
+              <span class="role-badge" [attr.data-role]="u.role">{{ u.role }}</span>
+            </td>
+            <td class="center">
+              <span class="verified-icon" *ngIf="u.emailVerified">&#10003;</span>
+              <span class="unverified-icon" *ngIf="!u.emailVerified">&#10007;</span>
+            </td>
+            <td>
+              <span class="active-badge" [class.active]="u.isActive" [class.inactive]="!u.isActive">
+                {{ u.isActive ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td class="date-sm">{{ formatDate(u.createdAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="filteredUsers.length === 0">
+        <div class="empty-icon">[ ]</div>
+        <p>Aucun utilisateur trouvé.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TAB COMMENTAIRES -->
+  <section class="tab-content" *ngIf="activeTab === 'comments'">
+
+    <div class="toolbar">
+      <div class="search-inline">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par contenu, utilisateur ou voyage..."
+          [(ngModel)]="commentSearch"
+        />
+      </div>
+      <span class="results-count">
+        {{ filteredComments.length }} / {{ commentsTotalElements }} commentaire(s)
+      </span>
+    </div>
+
+    <div class="loading-row" *ngIf="isLoadingComments">
+      <div class="spinner"></div>
+      <span>Chargement des commentaires...</span>
+    </div>
+
+    <div class="comments-list-wrap" *ngIf="!isLoadingComments">
+
+      <div class="empty-state" *ngIf="filteredComments.length === 0">
+        <div class="empty-icon">[ ]</div>
+        <p>Aucun commentaire trouvé.</p>
+      </div>
+
+      <ul class="comments-list" *ngIf="filteredComments.length > 0">
+        <li class="comment-card" *ngFor="let c of filteredComments" [class.deleting]="deletingCommentId === c.id">
+          <div class="comment-avatar">
+            <span class="avatar-sm">{{ c.username ? c.username[0].toUpperCase() : '?' }}</span>
+          </div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-author">{{ c.userFullName || c.username }}</span>
+              <span class="comment-username">&#64;{{ c.username }}</span>
+              <span class="comment-time">{{ getTimeAgo(c.createdAt) }}</span>
+            </div>
+            <div class="comment-content">{{ c.content }}</div>
+            <div class="comment-meta">
+              <span class="comment-on">Sur le voyage :</span>
+              <span class="comment-trip">{{ c.tripTitle || '—' }}</span>
+              <span class="comment-trip-id">#{{ c.tripId }}</span>
+            </div>
+          </div>
+          <div class="comment-actions">
+            <button
+              class="delete-btn"
+              (click)="removeComment(c)"
+              [disabled]="deletingCommentId === c.id"
+              title="Supprimer"
+            >
+              {{ deletingCommentId === c.id ? '...' : 'Supprimer' }}
+            </button>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+
+    <div class="pagination" *ngIf="commentsTotalPages > 1 && !isLoadingComments">
+      <button class="page-btn" (click)="prevCommentsPage()" [disabled]="commentsPage === 0">
+        &larr; Précédent
+      </button>
+      <span class="page-info">Page {{ commentsPage + 1 }} / {{ commentsTotalPages }}</span>
+      <button class="page-btn" (click)="nextCommentsPage()" [disabled]="commentsPage >= commentsTotalPages - 1">
+        Suivant &rarr;
+      </button>
+    </div>
+
+  </section>
+
+  <!-- TAB 4: MESSAGES -->
+  <section class="tab-content messages-tab" *ngIf="activeTab === 'messages'">
+
+    <div class="messages-layout">
+
+      <!-- LEFT PANEL: Conversation list -->
+      <aside class="conv-panel">
+        <div class="conv-header">
+          <h3>Conversations <span class="badge">{{ conversations.length }}</span></h3>
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              [(ngModel)]="conversationSearch"
+              (input)="searchConversations()"
+            />
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-row sm" *ngIf="isLoadingConversations">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Empty -->
+        <div class="no-conv" *ngIf="!isLoadingConversations && filteredConversations.length === 0">
+          <p>Aucune conversation trouvée.</p>
+        </div>
+
+        <!-- List -->
+        <ul class="conv-list" *ngIf="!isLoadingConversations">
+          <li
+            class="conv-item"
+            *ngFor="let conv of filteredConversations"
+            [class.active]="selectedConversation?.conversationKey === conv.conversationKey"
+            (click)="openConversation(conv)"
+          >
+            <div class="conv-avatars">
+              <div class="avatar-stack">
+                <span class="avatar av1">{{ getInitials(conv.participant1) }}</span>
+                <span class="avatar av2">{{ getInitials(conv.participant2) }}</span>
+              </div>
+            </div>
+            <div class="conv-info">
+              <div class="conv-names">
+                <span class="name">{{ userDisplayName(conv.participant1) }}</span>
+                <span class="sep"> &harr; </span>
+                <span class="name">{{ userDisplayName(conv.participant2) }}</span>
+              </div>
+              <div class="conv-last">{{ conv.lastMessage }}</div>
+            </div>
+            <div class="conv-meta">
+              <span class="conv-time">{{ getTimeAgo(conv.lastActivity) }}</span>
+              <span class="conv-count">{{ conv.messageCount }} msg</span>
+            </div>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- RIGHT PANEL: Message thread -->
+      <main class="thread-panel">
+
+        <!-- No selection -->
+        <div class="no-selection" *ngIf="!selectedConversation">
+          <div class="no-sel-icon">[ ]</div>
+          <h3>Sélectionnez une conversation</h3>
+          <p>Cliquez sur une conversation à gauche pour afficher les messages.</p>
+        </div>
+
+        <!-- Thread -->
+        <ng-container *ngIf="selectedConversation">
+          <!-- Thread header -->
+          <div class="thread-header">
+            <button class="close-btn" (click)="closeConversation()">X</button>
+            <div class="thread-participants">
+              <span class="avatar">{{ getInitials(selectedConversation.participant1) }}</span>
+              <div class="thread-names">
+                <span class="name-bold">{{ userDisplayName(selectedConversation.participant1) }}</span>
+                <span class="username-sm">&#64;{{ selectedConversation.participant1.username }}</span>
+              </div>
+              <span class="exchange-icon">&harr;</span>
+              <div class="thread-names">
+                <span class="name-bold">{{ userDisplayName(selectedConversation.participant2) }}</span>
+                <span class="username-sm">&#64;{{ selectedConversation.participant2.username }}</span>
+              </div>
+              <span class="avatar">{{ getInitials(selectedConversation.participant2) }}</span>
+            </div>
+            <span class="thread-count">{{ selectedConversation.messageCount }} messages</span>
+          </div>
+
+          <!-- Loading messages -->
+          <div class="loading-row" *ngIf="isLoadingMessages">
+            <div class="spinner"></div>
+            <span>Chargement des messages...</span>
+          </div>
+
+          <!-- Message bubbles -->
+          <div class="messages-list" *ngIf="!isLoadingMessages">
+
+            <div class="empty-thread" *ngIf="conversationMessages.length === 0">
+              <p>Aucun message dans cette conversation.</p>
+            </div>
+
+            <div
+              class="message-row"
+              *ngFor="let msg of conversationMessages"
+              [class.left]="isSenderParticipant1(msg)"
+              [class.right]="!isSenderParticipant1(msg)"
+            >
+              <!-- Avatar -->
+              <span class="msg-avatar" *ngIf="isSenderParticipant1(msg)">
+                {{ getInitials(msg.sender) }}
+              </span>
+
+              <div class="bubble-wrapper">
+                <div class="msg-meta-top">
+                  <span class="msg-author">
+                    {{ userDisplayName(msg.sender) }}
+                    <span class="at">&#64;{{ msg.sender.username }}</span>
+                  </span>
+                  <span class="msg-time">{{ formatDateTime(msg.createdAt) }}</span>
+                  <span class="read-badge" *ngIf="msg.isRead">Lu</span>
+                  <span class="unread-badge" *ngIf="!msg.isRead">Non lu</span>
+                </div>
+                <div class="bubble">{{ msg.content }}</div>
+              </div>
+
+              <span class="msg-avatar" *ngIf="!isSenderParticipant1(msg)">
+                {{ getInitials(msg.sender) }}
+              </span>
+            </div>
+
+          </div>
+          <!-- end messages-list -->
+        </ng-container>
+
+      </main>
+      <!-- end thread-panel -->
+
+    </div>
+    <!-- end messages-layout -->
+
+  </section>
+  <!-- end tab messages -->
+
+</div>
+<!-- end admin-wrapper -->

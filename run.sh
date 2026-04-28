@@ -1,8 +1,3 @@
-#!/bin/bash
-# ============================================================================
-# Travel2030 - Full Stack Launcher
-# Uses Java 17 | MySQL | Spring Boot 8085 | Angular 4200
-# ============================================================================
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$PROJECT_DIR/backend"
@@ -24,7 +19,6 @@ BACKEND_PID=""
 FRONTEND_PID=""
 FAKESMTP_PID=""
 
-# ── Force Java 17 ───────────────────────────────────────────────────────────
 if [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ]; then
     export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 elif [ -d "/usr/lib/jvm/java-1.17.0-openjdk-amd64" ]; then
@@ -39,7 +33,6 @@ else
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
 
-# ── Cleanup on Ctrl+C ───────────────────────────────────────────────────────
 cleanup() {
     echo ""
     echo -e "${YELLOW}Arret en cours...${NC}"

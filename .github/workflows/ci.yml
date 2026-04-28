@@ -2,12 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
-  # Backend Tests and Build
   backend:
     name: Backend - Build & Test
     runs-on: ubuntu-latest
@@ -62,7 +61,6 @@ jobs:
           path: backend/target/*.jar
           retention-days: 7
 
-  # Frontend Tests and Build
   frontend:
     name: Frontend - Build & Test
     runs-on: ubuntu-latest
@@ -101,7 +99,6 @@ jobs:
           path: frontend/dist/
           retention-days: 7
 
-  # Code Quality Checks
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -120,7 +117,6 @@ jobs:
         if: success()
         run: echo "All quality checks passed!"
 
-  # Deploy to staging (only on main branch)
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -143,7 +139,7 @@ jobs:
 
       - name: Deploy notification
         run: |
-          echo "🚀 Deployment artifacts ready!"
+          echo " Deployment artifacts ready"
           echo "Backend JAR: $(ls ./backend-jar)"
           echo "Frontend dist: $(ls ./frontend-dist)"
           # Add your deployment commands here (e.g., rsync, Docker push, etc.)
